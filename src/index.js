@@ -6,17 +6,31 @@ const BASE_URL = 'https://pixabay.com/api/';
 
 const formEl = document.querySelector('.search-form');
 const divEl = document.querySelector('.gallery');
+const button = document.querySelector('.load-more');
+console.log(button);
+
 formEl.addEventListener('submit', onSubmit);
+formEl.addEventListener('input', onInput);
+button.addEventListener('click', loadMore);
+
+let inputValue = '';
+let page = 1;
+
+function onInput(evt) {
+  inputValue = evt.target.value;
+}
 
 function onSubmit(evt) {
   evt.preventDefault();
-  const inputValue = evt.target.value;
-  wrap(inputValue).then(resp => createCard(resp));
+  wrap(page, inputValue).then(resp => createCard(resp));
 }
 
-async function wrap(param) {
-  const response = await axios.get(`${BASE_URL}?key=${KEY}&q=${param}`);
-  return response.hits;
+async function wrap(page = 1, param) {
+  const response = await axios.get(
+    `${BASE_URL}?key=${KEY}&q=${param}&page=${page}&per_page=100`
+  );
+  console.log(response);
+  return response.data.hits;
 }
 
 function createCard(arr) {
@@ -35,13 +49,13 @@ function createCard(arr) {
       <img src="${webformatURL}" alt="" loading="lazy" />
       <div class="info">
         <p class="info-item">
-          <b>${likes}</b>
+          <b>likes:${likes}</b>
         </p>
         <p class="info-item">
-          <b>${views}</b>
+          <b>views:${views}</b>
         </p>
         <p class="info-item">
-          <b>${comments}</b>
+          <b>comments:${comments}</b>
         </p>
         <p class="info-item">
           <b>${downloads}</b>
@@ -51,5 +65,17 @@ function createCard(arr) {
       }
     )
     .join('');
-  divEl.innerHTML = murkup;
+  divEl.insertAdjacentHTML('beforeend', murkup);
+  button.hidden = false;
+}
+
+function loadMore() {
+  page += 1;
+  wrap(page, inputValue).then(data => {
+    createCard(data);
+    console.log(data);
+    if (data.hits.length === 0) {
+      button.hidden = true;
+    }
+  });
 }
