@@ -1,9 +1,9 @@
 import axios from 'axios';
 import Notiflix from 'notiflix';
-// import SimpleLightbox from 'simplelightbox';
-// import 'simplelightbox/dist/simple-lightbox.min.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
-KEY = '33034390-7e7038dc39440b662093bd231';
+const KEY = '33034390-7e7038dc39440b662093bd231';
 const BASE_URL = 'https://pixabay.com/api/';
 
 const formEl = document.querySelector('.search-form');
@@ -18,9 +18,9 @@ button.addEventListener('click', loadMore);
 let inputValue = '';
 let page = 1;
 
-// let lightBox = new SimpleLightbox('.gallery a', {
-//   captionDelay: 250,
-// });
+let lightBox = new SimpleLightbox('.gallery a', {
+  captionDelay: 250,
+});
 
 function onInput(evt) {
   inputValue = evt.target.value;
@@ -41,6 +41,7 @@ function onSubmit(evt) {
       return;
     }
     createCard(resp);
+    lightBox.refresh();
   });
 }
 
@@ -93,16 +94,13 @@ function createCard(arr) {
 function loadMore() {
   page += 1;
   getImages(page, inputValue)
-    .then(data => {
-      if (data.hits.length < 40 || data.totalHits === 500) {
-        Notiflix.Notify.failure(
-          "We're sorry, but you've reached the end of search results."
-        );
-      }
-      createCard(data);
+    .then(data => createCard(data))
+    .catch(() => {
+      Notiflix.Notify.failure(
+        "We're sorry, but you've reached the end of search results."
+      );
       button.hidden = true;
-    })
-    .catch(() => {});
+    });
 }
 
 function clearMarkup() {
