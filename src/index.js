@@ -1,3 +1,4 @@
+import './index';
 import axios from 'axios';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
@@ -9,7 +10,6 @@ const BASE_URL = 'https://pixabay.com/api/';
 const formEl = document.querySelector('.search-form');
 const divEl = document.querySelector('.gallery');
 const button = document.querySelector('.load-more');
-console.log(button);
 
 formEl.addEventListener('submit', onSubmit);
 formEl.addEventListener('input', onInput);
@@ -25,8 +25,11 @@ let lightBox = new SimpleLightbox('.gallery a', {
 function onInput(evt) {
   inputValue = evt.target.value;
   if (inputValue === '') {
+    // button.hidden = true;
+    button.classList.remove('show');
+
     clearMarkup();
-    button.hidden = true;
+
     page = 1;
   }
 }
@@ -41,7 +44,6 @@ function onSubmit(evt) {
       return;
     }
     createCard(resp);
-    lightBox.refresh();
   });
 }
 
@@ -65,9 +67,9 @@ function createCard(arr) {
         comments,
         downloads,
       }) => {
-        return `<a href='${largeImageURL}'>
+        return `<a class = "gallery__link" href='${largeImageURL}'>
       <div class='photo-card'>
-      <img src=${webformatURL} alt='${tags}' loading='lazy' />
+      <img class = "gallery__image" src=${webformatURL} alt='${tags}' loading='lazy' />
       <div class='info'>
         <p class='info-item'>
           <b>Likes</b>${likes}
@@ -88,6 +90,7 @@ function createCard(arr) {
     )
     .join('');
   divEl.insertAdjacentHTML('beforeend', murkup);
+  lightBox.refresh();
   button.hidden = false;
 }
 
@@ -99,10 +102,12 @@ function loadMore() {
       Notiflix.Notify.failure(
         "We're sorry, but you've reached the end of search results."
       );
-      button.hidden = true;
+      // button.hidden = true;
+      button.classList.add('show');
     });
 }
 
 function clearMarkup() {
   divEl.innerHTML = '';
 }
+console.log('asdads');
