@@ -25,8 +25,7 @@ let lightBox = new SimpleLightbox('.gallery a', {
 function onInput(evt) {
   inputValue = evt.target.value;
   if (inputValue === '') {
-    // button.hidden = true;
-    button.classList.remove('show');
+    button.hidden = true;
 
     clearMarkup();
 
@@ -37,21 +36,21 @@ function onInput(evt) {
 function onSubmit(evt) {
   evt.preventDefault();
   getImages(page, inputValue).then(resp => {
-    if (resp.hits.length === 0) {
+    if (resp.hits.length === 0 || !inputValue) {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
       return;
     }
+    clearMarkup();
     createCard(resp);
   });
 }
 
 async function getImages(page = 1, param) {
   const response = await axios.get(
-    `${BASE_URL}?key=${KEY}&q=${param}&page=${page}&per_page=40`
+    `${BASE_URL}?key=${KEY}&q=${param}&page=${page}&per_page=40&image_type=photo&orientation=horizontal&safesearch=true`
   );
-  console.log(response);
   return response.data;
 }
 
@@ -97,17 +96,28 @@ function createCard(arr) {
 function loadMore() {
   page += 1;
   getImages(page, inputValue)
-    .then(data => createCard(data))
+    .then(data => {
+      if (data.hits.length === 0 || data.hits.length < 40) {
+        array = 40;
+
+        Notiflix.Notify.failure(
+          "We're sorry, but you've reached the end of search results."
+        );
+        createCard(data);
+        button.hidden = true;
+        return;
+      }
+
+      createCard(data);
+    })
     .catch(() => {
       Notiflix.Notify.failure(
         "We're sorry, but you've reached the end of search results."
       );
-      // button.hidden = true;
-      button.classList.add('show');
+      button.hidden = true;
     });
 }
 
 function clearMarkup() {
   divEl.innerHTML = '';
 }
-console.log('asdads');
