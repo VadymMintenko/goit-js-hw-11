@@ -1,11 +1,11 @@
+import getImages from './getImages';
 import './index';
-import axios from 'axios';
 import Notiflix from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const KEY = '33034390-7e7038dc39440b662093bd231';
-const BASE_URL = 'https://pixabay.com/api/';
+// const KEY = '33034390-7e7038dc39440b662093bd231';
+// const BASE_URL = 'https://pixabay.com/api/';
 
 const formEl = document.querySelector('.search-form');
 const divEl = document.querySelector('.gallery');
@@ -47,12 +47,12 @@ function onSubmit(evt) {
   });
 }
 
-async function getImages(page = 1, param) {
-  const response = await axios.get(
-    `${BASE_URL}?key=${KEY}&q=${param}&page=${page}&per_page=40&image_type=photo&orientation=horizontal&safesearch=true`
-  );
-  return response.data;
-}
+// async function getImages(page = 1, param) {
+//   const response = await axios.get(
+//     `${BASE_URL}?key=${KEY}&q=${param}&page=${page}&per_page=40&image_type=photo&orientation=horizontal&safesearch=true`
+//   );
+//   return response.data;
+// }
 
 function createCard(arr) {
   const murkup = arr.hits
@@ -97,9 +97,7 @@ function loadMore() {
   page += 1;
   getImages(page, inputValue)
     .then(data => {
-      if (data.hits.length === 0 || data.hits.length < 40) {
-        array = 40;
-
+      if (data.hits.length === 0) {
         Notiflix.Notify.failure(
           "We're sorry, but you've reached the end of search results."
         );
